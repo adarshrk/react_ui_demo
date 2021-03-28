@@ -1,10 +1,10 @@
 
+import React from 'react';
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import withStyles from "@material-ui/core/styles/withStyles";
 
 import styles from './styles';
-import React from "react";
 
 const PopulateItems = (props) => {
     const {classes, item} = props;
@@ -66,7 +66,7 @@ const PopulateItems = (props) => {
                                 label="Last Checked Out By"
                                 name="lastCheckedOutBy"
                                 autoComplete="lastCheckedOutBy"
-                                value={item.lastCheckedOutBy}
+                                value={item.last_checked_out_by}
                                 onChange={props.handleChange}
                             />
                         </Grid>
@@ -79,7 +79,7 @@ const PopulateItems = (props) => {
                                 label="Last Checked Out Date"
                                 name="lastCheckedDate"
                                 autoComplete="lastCheckedDate"
-                                value={item.lastCheckedDate}
+                                value={item.last_checked_date}
                                 onChange={props.handleChange}
                             />
                         </Grid>
@@ -91,7 +91,7 @@ const PopulateItems = (props) => {
                                 label="Checking Out For"
                                 name="checkedOutBy"
                                 autoComplete="checkedOutBy"
-                                value={item.checkedOutBy}
+                                value={item.checked_out_by}
                                 onChange={props.handleChange}
                             />
                         </Grid>
@@ -110,7 +110,7 @@ const PopulateItems = (props) => {
                                 label="Last Checked Out By"
                                 name="lastCheckedOutBy"
                                 autoComplete="lastCheckedOutBy"
-                                value={item.lastCheckedOutBy}
+                                value={item.last_checked_out_by}
                                 onChange={props.handleChange}
                             />
                         </Grid>
@@ -123,7 +123,7 @@ const PopulateItems = (props) => {
                                 label="Last Checked Out Date"
                                 name="lastCheckedDate"
                                 autoComplete="lastCheckedDate"
-                                value={item.lastCheckedDate}
+                                value={item.last_checked_date}
                                 onChange={props.handleChange}
                             />
                         </Grid>

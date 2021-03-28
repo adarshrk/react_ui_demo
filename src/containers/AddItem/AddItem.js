@@ -1,33 +1,26 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import PersistentDrawer from "../../UI/Drawer/Drawer";
 import PopulateItem from "../../components/PopulateItem/PopulateItem";
 import ActionToolbarFormPage from "../../UI/ActionToolbarFormPage/ActionToolbarFormPage";
 
 import axiosInstance from "../../Utility/getAxiosInstance";
 
-class AddItemInInventory extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            device: '',
-            os: '',
-            manufacturer: ''
-        };
-    }
+const AddItemInInventory = (props) => {
+    const [item, setItem] = useState({ device: '', os: '', manufacturer: ''});
 
-    handleChange = (event) => {
-        this.setState({
-          [event.target.name]: event.target.value,
+    const handleChange = (event) => {
+        setItem(prevState => {
+            return { ...prevState, [event.target.name]: event.target.value};
         });
     };
 
-    handleSubmit = (event) => {
+    const handleSubmit = (event) => {
         event.preventDefault();
-        if(this.state.device && this.state.os && this.state.manufacturer) {
+        if(item.device && item.os && item.manufacturer) {
             axiosInstance
-            .post('/inventory', {...this.state})
+            .post('/inventory', {...item})
             .then((response) => {
-                this.props.history.push('/');
+                props.history.push('/');
             })
             .catch((err) => {
                 console.log(err);
@@ -37,19 +30,17 @@ class AddItemInInventory extends Component {
         }
     };
 
-    handleCancel = () => {
-        this.props.history.goBack();
+    const handleCancel = () => {
+        props.history.goBack();
     };
 
-    render(){
-        return (
-        <React.Fragment>
-            <PersistentDrawer headerLabel="Create" />
-            <ActionToolbarFormPage handleCancel={this.handleCancel} handleSubmit={this.handleSubmit}/>
-            <PopulateItem item={{...this.state}} handleChange={this.handleChange} />    
-        </React.Fragment>
+    return (
+    <React.Fragment>
+        <PersistentDrawer headerLabel="Create" />
+        <ActionToolbarFormPage handleCancel={handleCancel} handleSubmit={handleSubmit}/>
+        <PopulateItem item={{...item}} handleChange={handleChange} />    
+    </React.Fragment>
     );
-    }
 
 };
 

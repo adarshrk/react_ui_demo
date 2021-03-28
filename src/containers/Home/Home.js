@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 import IconButton from "@material-ui/core/IconButton";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
@@ -11,64 +11,59 @@ import InventoryList from "../../components/InventoryList/InventoryList";
 import styles from "./styles";
 import axiosInstance from "../../Utility/getAxiosInstance";
 
-class Home extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-        inventory: [],
-        uiLoading: true,
-    };
-  }
+const Home = (props) => {
+  const [inventory, setInventory] = useState([]);
+  const [uiLoading, setUiLoading] = useState(true);
 
-  handleNewItem = () => {
-    this.props.history.push("/addItemInInventory");
-  }
+  const handleNewItem = () => {
+    props.history.push("/addItemInInventory");
+  };
 
-  handleDelete = (id) => {
+  const handleDelete = useCallback((id) => {
     axiosInstance
-    .delete(`/inventory/${id}`)
-    .then((response) => {
-        this.props.history.go('/');
-    })
-    .catch((err) => {
+      .delete(`/inventory/${id}`)
+      .then((response) => {
+        props.history.go("/");
+      })
+      .catch((err) => {
         console.log(err);
-    });
-  }
+      });
+  }, [props.history]);
 
-  componentDidMount = () => {
+  useEffect(() => {
     axiosInstance
-    .get('/inventory')
-    .then((response) => {
-        this.setState({
-            inventory: response.data,
-            uiLoading: false,
-        });
-    })
-    .catch((err) => {
+      .get("/inventory")
+      .then((response) => {
+        setInventory((prevInventory) => [...prevInventory, ...response.data]);
+        setUiLoading(false);
+      })
+      .catch((err) => {
         console.log(err);
-    });
-  }
+      });
+  }, []);
 
-  render() {
-    const { classes } = this.props;
-    return this.state.uiLoading ? (
-      <Loader classes={classes} uiLoading={this.state.uiLoading} />
-    ) : (
-      <React.Fragment>
-        <PersistentDrawer headerLabel="Inventory" />
-        <IconButton
-            className={classes.floatingButton}
-            color="primary"
-            aria-label="Add Item"
-            disabled={this.state.inventory.length > 10 ? true : false}
-            onClick={this.handleNewItem}
-        >
-            <AddCircleIcon style={{ fontSize: 60 }} />
-        </IconButton>
-        <InventoryList classes={classes} inventory={this.state.inventory} handleDelete={this.handleDelete} />
-      </React.Fragment>
-    );
-  }
-}
+  const { classes } = props;
+  return uiLoading ? (
+    <Loader classes={classes} uiLoading={uiLoading} />
+  ) : (
+    <React.Fragment>
+      <PersistentDrawer headerLabel="Inventory" />
+      <IconButton
+        className={classes.floatingButton}
+        color="primary"
+        aria-label="Add Item"
+        disabled={inventory.length > 10 ? true : false}
+        onClick={handleNewItem}
+      >
+        <AddCircleIcon style={{ fontSize: 60 }} />
+      </IconButton>
+      <InventoryList
+        classes={classes}
+        inventory={inventory}
+        handleDelete={handleDelete}
+      />
+    </React.Fragment>
+  );
+};
 
 export default withStyles(styles)(Home);

@@ -1,56 +1,57 @@
-import React, { Component } from 'react';
+import React, { useState } from "react";
 
 import PersistentDrawer from "../../UI/Drawer/Drawer";
-import PopulateItem from "../../components/PopulateItem/PopulateItem"
+import PopulateItem from "../../components/PopulateItem/PopulateItem";
 import ActionToolbarFormPage from "../../UI/ActionToolbarFormPage/ActionToolbarFormPage";
 
 import axiosInstance from "../../Utility/getAxiosInstance";
 
-class UpdateInventory extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            checkedOutBy: ''
+const UpdateInventory = (props) => {
+  const [checkedOutBy, setCheckedOutBy] = useState('');
+
+  const handleChange = (event) => {
+    setCheckedOutBy(event.target.value);
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const checkedItem = props.location.state.is_checked_out
+      ? { ...props.location.state, is_checked_out: false }
+      : {
+          ...props.location.state,
+          last_checked_out_by: checkedOutBy,
+          is_checked_out: true,
         };
-    }
+    axiosInstance
+      .put(`/inventory/${props.match.params.id}`, checkedItem)
+      .then((response) => {
+        props.history.push("/");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
-    handleChange = (event) => {
-        this.setState({
-          [event.target.name]: event.target.value,
-        });
-    };
+  const handleCancel = () => {
+    props.history.replace("/");
+  };
 
-    handleSubmit = (event) => {
-        event.preventDefault();
-        const checkedItem = this.props.location.state.isCheckedOut ? 
-            {...this.props.location.state, isCheckedOut: false} :
-            {...this.props.location.state, lastCheckedOutBy: this.state.checkedOutBy, isCheckedOut: true};
-        axiosInstance
-        .put(`/inventory/${this.props.match.params.id}`, checkedItem)
-        .then((response) => {
-            this.props.history.push('/');
-        })
-        .catch((err) => {
-            console.log(err);
-        });
-    };
-
-    handleCancel = () => {
-        this.props.history.goBack();
-    };
-
-    render(){
-        const item = { ...this.props.location.state };
-        const action = item.isCheckedOut ? "checkIn" : "checkOut";
-        return (
-        <React.Fragment>
-            <PersistentDrawer headerLabel="Update" />
-            <ActionToolbarFormPage handleCancel={this.handleCancel} handleSubmit={this.handleSubmit}/>
-            <PopulateItem item={item} action={action} handleChange={this.handleChange} />    
-        </React.Fragment>
-    );
-    }
-
+  const item = { ...props.location.state };
+  const action = item.is_checked_out ? "checkIn" : "checkOut";
+  return (
+    <React.Fragment>
+      <PersistentDrawer headerLabel="Update" />
+      <ActionToolbarFormPage
+        handleCancel={handleCancel}
+        handleSubmit={handleSubmit}
+      />
+      <PopulateItem
+        item={item}
+        action={action}
+        handleChange={handleChange}
+      />
+    </React.Fragment>
+  );
 };
 
 export default UpdateInventory;

@@ -1,5 +1,7 @@
+import React from 'react';
 import { Link } from "react-router-dom";
 
+import Alert from '@material-ui/lab/Alert';
 import Table from "@material-ui/core/Table";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
@@ -14,6 +16,21 @@ import TableContainer from "@material-ui/core/TableContainer";
 
 const inventoryList = (props) => {
   const { classes, inventory } = props;
+  const checkForWeekOldDevice = (checkOutDate, status) => {
+    const today = new Date();
+    const prevweek = new Date(today.getFullYear(), today.getMonth(), today.getDate()-7);
+    return (status && prevweek - new Date(checkOutDate) > 0) ? 
+    <Alert severity="warning">Device checked week old!</Alert>
+    : null;
+  };
+
+  const validateCheckOutTime = (is_checked_out) => {
+    const today = new Date();
+    const currentHr = today.getHours();
+    if(!is_checked_out && (currentHr < 9 || currentHr > 17)) return true;
+    return false; 
+  };
+
   return (
     <main className={classes.content}>
       <Typography variant="h5" component="h5">
@@ -35,28 +52,29 @@ const inventoryList = (props) => {
           </TableHead>
           <TableBody>
             {inventory.map((item) => (
-              <TableRow key={item.id}>
+              <TableRow key={item._id}>
                 <TableCell align="left">{item.device}</TableCell>
                 <TableCell align="left">{item.os}</TableCell>
                 <TableCell align="left">{item.manufacturer}</TableCell>
-                <TableCell align="left">{item.isCheckedOut ? 'Yes' : 'No'}</TableCell>
-                <TableCell align="left">{item.lastCheckedOutBy}</TableCell>
-                <TableCell align="left">{item.lastCheckedDate}</TableCell>
+                <TableCell align="left">{item.is_checked_out ? 'Yes' : 'No'}</TableCell>
+                <TableCell align="left">{item.last_checked_out_by}</TableCell>
+                <TableCell align="left">{item.last_checked_date}</TableCell>
                 <TableCell align="left">
                   <Link
-                      to={{
-                        pathname: `/updateInventory/${item.id}`,
+                      to={!validateCheckOutTime(item.is_checked_out) ? {
+                        pathname: `/updateInventory/${item._id}`,
                         state: item,
-                      }}
+                      } : '/'}
                       style={{ textDecoration: "inherit", color: "inherit" }}
                   >
                     <Button size="small" color="primary">
-                      {item.isCheckedOut ? 'Check In' : 'Check Out'}
+                      {item.is_checked_out ? 'Check In' : 'Check Out'}
                     </Button>
                   </Link>
+                  {checkForWeekOldDevice(item.last_checked_date, item.is_checked_out)}
                 </TableCell>
                 <TableCell align="left">
-                  <Button size="small" color="primary" onClick={() => props.handleDelete(item.id)} disabled={item.isCheckedOut ? true : false}>
+                  <Button size="small" color="primary" onClick={() => props.handleDelete(item._id)} disabled={item.is_checked_out ? true : false}>
                     Delete
                   </Button>
                 </TableCell>
@@ -65,8 +83,9 @@ const inventoryList = (props) => {
           </TableBody>
         </Table>
       </TableContainer>
+      
     </main>
   );
 };
 
-export default inventoryList;
+export default React.memo(inventoryList);
